@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Quest: The Grand Mission</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General game-themed styling */
+        :root {
+            --background-dark: #b3e5fc; /* Light blue */
+            --text-light: #444; /* Dark gray */
+            --parchment-color: #fcf8e3; /* Light cream/yellow */
+            --border-dark: #81c784; /* Soft green */
+            --button-bg: #81c784; /* Soft green */
+            --button-hover: #a5d6a7; /* Lighter green */
+            --button-text: #fff;
+            --highlight-color: #ffd700; /* Gold */
+            --dark-text-on-light: #2e7d32; /* Dark green */
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, #b3e5fc, #81d4fa, #e6ee9c);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overflow-y: auto;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            padding: 2.5rem;
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 2px solid var(--border-dark);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Title and instructions */
+        h1 {
+            color: var(--dark-text-on-light);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .quest-instructions {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--border-dark);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            color: var(--dark-text-on-light);
+        }
+
+        /* Quest display area */
+        .quest-display {
+            background-color: var(--parchment-color);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: left;
+            position: relative;
+        }
+        
+        /* New character container and styling */
+        .character-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .character-image {
+            width: 80px;
+            height: auto;
+            border-radius: 50%;
+            border: 3px solid var(--border-dark);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0; /* Prevents the image from shrinking */
+        }
+        
+        .quest-text-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quest-image {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--border-dark);
+            margin-bottom: 20px;
+        }
+
+        .quest-title {
+            font-size: 2rem;
+            color: var(--dark-text-on-light);
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+            margin-bottom: 15px;
+            position: relative;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed var(--border-dark);
+        }
+        
+        .quest-description {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .quest-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            color: var(--dark-text-on-light);
+        }
+
+        /* Custom checkbox styling */
+        .quest-status input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            background-color: #c0c0c0;
+            border: 2px solid #666;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .quest-status input[type="checkbox"]:checked {
+            background-color: #28a745;
+            border-color: #1a6f2e;
+        }
+
+        .quest-status input[type="checkbox"]:checked::after {
+            content: '\2713'; /* Checkmark symbol */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Badge display styling */
+        .badge-earned {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge-earned-title {
+            font-size: 1.5rem;
+            color: var(--dark-text-on-light);
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .badge-earned-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 2px solid var(--border-dark);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Navigation buttons */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .navigation-buttons .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navigation-buttons button {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            padding: 15px 25px;
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            white-space: nowrap; /* Prevents button text from wrapping */
+        }
+        
+        /* New button for Hall of Fame */
+        .navigation-buttons #hallOfFameBtn {
+            background-color: #ffd700;
+            color: #2e7d32;
+            border-color: #b8860b;
+        }
+
+        .navigation-buttons #hallOfFameBtn:hover {
+            background-color: #ffeb99;
+        }
+
+        .navigation-buttons button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .navigation-buttons button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .navigation-buttons button:disabled {
+            background-color: #a0a0a0;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .current-quest-info {
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            color: var(--dark-text-on-light);
+        }
+
+        /* Hall of Fame styling */
+        .hall-of-fame {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
+            justify-items: center;
+            align-items: center;
+        }
+
+        /* Badge item is now a button */
+        .badge-item {
+            all: unset; /* Remove default button styles */
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            width: 100px;
+            transition: transform 0.2s ease;
+        }
+        
+        .badge-item:hover {
+            transform: scale(1.05);
+        }
+
+        .badge-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: filter 0.5s ease-in-out;
+            border-radius: 10px;
+            border: 2px solid var(--border-dark);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .badge-image.locked {
+            filter: grayscale(100%);
+        }
+
+        .badge-title {
+            font-size: 0.9rem;
+            text-align: center;
+            color: var(--dark-text-on-light);
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .quest-instructions {
+                font-size: 0.9rem;
+            }
+            .quest-title {
+                font-size: 1.5rem;
+            }
+            .quest-description {
+                font-size: 1rem;
+            }
+            .navigation-buttons button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            .navigation-buttons .nav-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Classroom Quest: The Grand Mission</h1>
+        <div class="quest-instructions">
+            Lemmy the Guide is here to help you on your adventure! Follow Lemmy's instructions to find each location on your mission checklist. When you find a location, mark it as "unlocked" with a checkmark!
+        </div>
+
+        <div class="quest-display" id="questDisplay">
+            <!-- Quest content will be rendered here by JavaScript -->
+            <div id="questContent">
+                <div class="character-container">
+                    <!-- Lemmy the Guide with a placeholder image -->
+                    <img class="character-image" src="https://placehold.co/80x80/ffe680/000?text=Lemmy" alt="Lemmy the Guide">
+                    <div class="quest-text-content">
+                        <img id="questImage" class="quest-image" alt="Quest Image Placeholder">
+                        <h2 id="questTitle" class="quest-title"></h2>
+                        <p id="questDescription" class="quest-description"></p>
+                    </div>
+                </div>
+                
+                <!-- This section toggles between the checkbox and the earned badge display -->
+                <div id="interactiveArea">
+                    <div class="quest-status" id="questStatus">
+                        <input type="checkbox" id="unlockedCheckbox">
+                        <label for="unlockedCheckbox">Mark as Unlocked!</label>
+                    </div>
+                    <div id="badgeEarnedDisplay" class="badge-earned" style="display: none;">
+                        <h3 class="badge-earned-title">Badge Earned!</h3>
+                        <img id="earnedBadgeImage" class="badge-earned-image" src="" alt="Badge earned for quest completion">
+                        <span id="earnedBadgeTitle" class="badge-title"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hall of Fame content, hidden by default -->
+            <div id="hallOfFame" style="display: none;">
+                <h2 class="quest-title" style="text-align: center;">Hall of Fame: Collected Badges</h2>
+                <div id="badgesContainer" class="hall-of-fame">
+                    <!-- Badges will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <div class="nav-group">
+                <button id="prevBtn" disabled>&lt; Previous</button>
+                <button id="nextBtn">Next &gt;</button>
+            </div>
+            <span id="questInfo" class="current-quest-info">Quest 1 of 13</span>
+            <button id="hallOfFameBtn">Hall of Fame</button>
+        </div>
+    </div>
+
+    <script>
+        // Array containing all the quest data, including badge information
+        const quests = [
+            {
+                title: "Your First Quest!",
+                description: "Greetings, brave adventurer! Your quest leader has given you a mission checklist. Use the 'Next' button to begin your journey and find each location on the list. Once you find a location, mark it as 'unlocked' with a checkmark!",
+                image: "https://placehold.co/600x250/90EE90/2e7d32?text=Welcome+Adventurer!",
+                badge: {
+                    title: "Welcome Badge",
+                    unlockedUrl: "https://placehold.co/100x100/ffd700/000?text=Quest+1"
+                }
+            },
+            {
+                title: "The Knowledge Library",
+                description: "Unlock the portal to new worlds and stories! Your key to the portal is your library card.",
+                image: "https://placehold.co/600x250/B3E5FC/2E7D32?text=Knowledge+Library",
+                badge: {
+                    title: "Library Badge",
+                    unlockedUrl: "https://placehold.co/100x100/51528b/fff?text=Quest+2"
+                }
+            },
+            {
+                title: "The Supply Depot",
+                description: "Find your inventory of tools like glue, tape, rulers, and scissors.",
+                image: "https://placehold.co/600x250/FFFACD/2E7D32?text=Supply+Depot",
+                badge: {
+                    title: "Depot Badge",
+                    unlockedUrl: "https://placehold.co/100x100/1e7343/fff?text=Quest+3"
+                }
+            },
+            {
+                title: "The Boss Level (Teacher's Desk)",
+                description: "The ultimate quest-giver's command center! Stay clear unless summoned.",
+                image: "https://placehold.co/600x250/B3E5FC/2E7D32?text=Boss+Level",
+                badge: {
+                    title: "Boss Badge",
+                    unlockedUrl: "https://placehold.co/100x100/d74c4c/fff?text=Quest+4"
+                }
+            },
+            {
+                title: "The Schedule Scroll",
+                description: "Where can you find the map for our daily adventure?",
+                image: "https://placehold.co/600x250/FFFACD/2E7D32?text=Schedule+Scroll",
+                badge: {
+                    title: "Schedule Badge",
+                    unlockedUrl: "https://placehold.co/100x100/7754a5/fff?text=Quest+5"
+                }
+            },
+            {
+                title: "The 'Lost and Found' Dungeon",
+                description: "For any gear or treasure you may have dropped on your journey!",
+                image: "https://placehold.co/600x250/B3E5FC/2E7D32?text=Lost+and+Found",
+                badge: {
+                    title: "Dungeon Badge",
+                    unlockedUrl: "https://placehold.co/100x100/8d8d8d/fff?text=Quest+6"
+                }
+            },
+            {
+                title: "The Turn-in Bin",
+                description: "Where do you submit your completed quests?",
+                image: "https://placehold.co/600x250/FFFACD/2E7D32?text=Turn-in+Bin",
+                badge: {
+                    title: "Turn-in Badge",
+                    unlockedUrl: "https://placehold.co/100x100/4c76a5/fff?text=Quest+7"
+                }
+            },
+            {
+                title: "The Healing Potion Station (First Aid)",
+                description: "Where do you go to get patched up and re-energized after a small scrape or bump?",
+                image: "https://placehold.co/600x250/90EE90/2E7D32?text=Healing+Potion+Station",
+                badge: {
+                    title: "Healing Badge",
+                    unlockedUrl: "https://placehold.co/100x100/d9a11d/000?text=Quest+8"
+                }
+            },
+            {
+                title: "The Hydration Station (Water Fountain)",
+                description: "Find the life spring to restore your health!",
+                image: "https://placehold.co/600x250/B3E5FC/2E7D32?text=Hydration+Station",
+                badge: {
+                    title: "Water Badge",
+                    unlockedUrl: "https://placehold.co/100x100/52c2e0/fff?text=Quest+9"
+                }
+            },
+            {
+                title: "The 'Secret Passage' Portal (Restrooms)",
+                description: "Sign the log-book here before you teleport to the restroom.",
+                image: "https://placehold.co/600x250/FFFACD/2E7D32?text=Secret+Passage",
+                badge: {
+                    title: "Portal Badge",
+                    unlockedUrl: "https://placehold.co/100x100/2f4f4f/fff?text=Quest+10"
+                }
+            },
+            {
+                title: "The 'Power-Up' Zone (Small Group Area)",
+                description: "Where do you go to team up with your friends to complete a side quest?",
+                image: "https://placehold.co/600x250/90EE90/2E7D32?text=Power-Up+Zone",
+                badge: {
+                    title: "Power-Up Badge",
+                    unlockedUrl: "https://placehold.co/100x100/ff6b6b/fff?text=Quest+11"
+                }
+            },
+            {
+                title: "The Class 'Hall of Fame' (Bulletin Boards)",
+                description: "Find where the quests of the past are celebrated!",
+                image: "https://placehold.co/600x250/FFFACD/2E7D32?text=Class+Hall+of+Fame",
+                badge: {
+                    title: "Fame Badge",
+                    unlockedUrl: "https://placehold.co/100x100/f5a04c/000?text=Quest+12"
+                }
+            },
+            {
+                title: "The 'Learning Organization' Zone",
+                description: "Find the storage area for your notebooks and find your assigned color!",
+                image: "https://placehold.co/600x250/B3E5FC/2E7D32?text=Learning+Organization+Zone",
+                badge: {
+                    title: "Organization Badge",
+                    unlockedUrl: "https://placehold.co/100x100/87ceeb/000?text=Quest+13"
+                }
+            }
+        ];
+
+        // The total number of slides is the quests array length + 1 for the Hall of Fame
+        const totalSlides = quests.length + 1;
+
+        // Get references to the HTML elements
+        const questContentEl = document.getElementById('questContent');
+        const hallOfFameEl = document.getElementById('hallOfFame');
+        const badgesContainerEl = document.getElementById('badgesContainer');
+        const questImageEl = document.getElementById('questImage');
+        const questTitleEl = document.getElementById('questTitle');
+        const questDescriptionEl = document.getElementById('questDescription');
+        const questStatusEl = document.getElementById('questStatus');
+        const unlockedCheckboxEl = document.getElementById('unlockedCheckbox');
+        const badgeEarnedDisplayEl = document.getElementById('badgeEarnedDisplay');
+        const earnedBadgeImageEl = document.getElementById('earnedBadgeImage');
+        const earnedBadgeTitleEl = document.getElementById('earnedBadgeTitle');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const hallOfFameBtn = document.getElementById('hallOfFameBtn');
+        const questInfoEl = document.getElementById('questInfo');
+
+        // State variables
+        let currentQuestIndex = 0;
+        let unlockedStatus = {}; // Object to store the unlocked state of each quest
+
+        /**
+         * Renders the current quest's content to the display.
+         */
+        function renderQuest() {
+            // Check if we are on the final "Hall of Fame" slide
+            if (currentQuestIndex === quests.length) {
+                // Show the Hall of Fame content and hide the normal quest content
+                questContentEl.style.display = 'none';
+                hallOfFameEl.style.display = 'block';
+                renderHallOfFame();
+            } else {
+                // Show the normal quest content and hide the Hall of Fame
+                questContentEl.style.display = 'flex';
+                hallOfFameEl.style.display = 'none';
+                
+                const currentQuest = quests[currentQuestIndex];
+                questImageEl.src = currentQuest.image;
+                questImageEl.alt = currentQuest.title + " Image";
+                questTitleEl.textContent = currentQuest.title;
+                questDescriptionEl.textContent = currentQuest.description;
+
+                // Update the checkbox state based on the stored unlockedStatus
+                const isUnlocked = unlockedStatus[currentQuestIndex] || false;
+                unlockedCheckboxEl.checked = isUnlocked;
+
+                // If the quest is unlocked, show the badge display. Otherwise, show the checkbox.
+                if (isUnlocked) {
+                    questStatusEl.style.display = 'none';
+                    badgeEarnedDisplayEl.style.display = 'flex';
+                    earnedBadgeImageEl.src = currentQuest.badge.unlockedUrl;
+                    earnedBadgeTitleEl.textContent = currentQuest.badge.title;
+                } else {
+                    questStatusEl.style.display = 'flex';
+                    badgeEarnedDisplayEl.style.display = 'none';
+                }
+            }
+
+            // Update navigation button states
+            prevBtn.disabled = currentQuestIndex === 0;
+            nextBtn.disabled = currentQuestIndex === totalSlides - 1;
+
+            // Update quest number display, handling the Hall of Fame slide
+            if (currentQuestIndex === quests.length) {
+                questInfoEl.textContent = `Mission Complete!`;
+            } else {
+                questInfoEl.textContent = `Quest ${currentQuestIndex + 1} of ${quests.length}`;
+            }
+        }
+
+        /**
+         * Renders the Hall of Fame slide with all badges.
+         */
+        function renderHallOfFame() {
+            badgesContainerEl.innerHTML = ''; // Clear previous badges
+            quests.forEach((quest, index) => {
+                const isUnlocked = unlockedStatus[index];
+                const badgeItem = document.createElement('button'); // Changed to a button
+                badgeItem.className = 'badge-item';
+                badgeItem.setAttribute('data-index', index); // Store the index
+
+                const badgeImage = document.createElement('img');
+                badgeImage.className = 'badge-image';
+                badgeImage.alt = quest.badge.title;
+                // Use the unlocked URL if the quest is unlocked, otherwise use a placeholder
+                badgeImage.src = isUnlocked ? quest.badge.unlockedUrl : "https://placehold.co/100x100/d7e4ea/2E7D32?text=Badge";
+                if (!isUnlocked) {
+                    badgeImage.classList.add('locked');
+                }
+
+                const badgeTitle = document.createElement('span');
+                badgeTitle.className = 'badge-title';
+                badgeTitle.textContent = quest.badge.title;
+
+                badgeItem.appendChild(badgeImage);
+                badgeItem.appendChild(badgeTitle);
+                badgesContainerEl.appendChild(badgeItem);
+            });
+        }
+
+        /**
+         * Handles the click event for a badge in the Hall of Fame.
+         * @param {Event} event - The click event object.
+         */
+        function handleBadgeClick(event) {
+            // Find the closest parent button element
+            const button = event.target.closest('button.badge-item');
+            if (button) {
+                const questIndex = parseInt(button.getAttribute('data-index'), 10);
+                if (!isNaN(questIndex)) {
+                    currentQuestIndex = questIndex;
+                    renderQuest();
+                }
+            }
+        }
+
+        /**
+         * Handles the click event for the "Next" button.
+         */
+        function handleNextQuest() {
+            if (currentQuestIndex < totalSlides - 1) {
+                currentQuestIndex++;
+                renderQuest();
+            }
+        }
+
+        /**
+         * Handles the click event for the "Previous" button.
+         */
+        function handlePrevQuest() {
+            if (currentQuestIndex > 0) {
+                currentQuestIndex--;
+                renderQuest();
+            }
+        }
+
+        /**
+         * Handles the click event for the "Hall of Fame" button.
+         */
+        function handleHallOfFame() {
+            currentQuestIndex = quests.length;
+            renderQuest();
+        }
+
+        /**
+         * Handles the change event for the checkbox.
+         * @param {Event} event - The change event object.
+         */
+        function handleCheckboxChange(event) {
+            unlockedStatus[currentQuestIndex] = event.target.checked;
+            renderQuest();
+        }
+
+        // Add event listeners to the buttons and checkbox
+        nextBtn.addEventListener('click', handleNextQuest);
+        prevBtn.addEventListener('click', handlePrevQuest);
+        hallOfFameBtn.addEventListener('click', handleHallOfFame);
+        unlockedCheckboxEl.addEventListener('change', handleCheckboxChange);
+
+        // Add event listener to the badges container for clicks
+        badgesContainerEl.addEventListener('click', handleBadgeClick);
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuest();
+        });
+    </script>
+
+</body>
+</html>
